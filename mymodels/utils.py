@@ -134,3 +134,19 @@ def plot_grid_image_masks(original_folder, mask_folder, save_path='results.png')
     plt.subplots_adjust(wspace=0.02, hspace=-0.6)
     plt.savefig(save_path, bbox_inches='tight')
     plt.show()
+
+def overlay_mask(img_path, mask_path, color=(0, 0, 255), pad=(8,8), opacity=0.3):
+    img = Image.open(img_path).convert("RGB")
+    mask = Image.open(mask_path).convert("L")
+    # img.convert("RGBA")
+
+    color_mask = Image.new("RGB", img.size, color)
+
+    # box = (pad[0], pad[1], mask.size[0] - pad[0], mask.size[1] - pad[1])
+    color_mask = Image.composite(color_mask, img, mask)
+
+    # print(color_mask.size, img.size, mask_pil.crop((8, 8, mask_pil.size[0] - 8, mask_pil.size[1] - 8)).size)
+
+    img = img.convert(color_mask.mode)
+
+    return Image.blend(img, color_mask, opacity)
