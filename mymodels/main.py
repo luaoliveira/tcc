@@ -9,10 +9,15 @@ import torch
 from train import train_model, eval_model
 from PIL import Image
 from inference import run_inference
+import numpy as np
+from utils import plot_error_curves
+from metrics import calc_all_metrics
 
 images_dir='training_images'
 masks_dir = 'training_masks'
-epochs=15
+epochs=30
+train_losses=np.zeros(epochs)
+eval_losses=np.zeros(epochs)
 
 def main():
 
@@ -35,6 +40,7 @@ def main():
         images_dir="validation_images",
         masks_dir="validation_masks",
     )
+
     dataloader_eval=DataLoader(dataset_eval, batch_size=4, shuffle=False)
 
     print('Training model...')
@@ -54,19 +60,28 @@ def main():
             device=device
         )
 
+        #Calculate the average loss and evaluation for each batch
+        loss_train = running_loss_train / len(dataloader_training)
+        eval_train = running_loss_eval / len(dataloader_eval)
+
+        train_losses[epoch]=loss_train
+        eval_losses[epoch] = eval_train
+
         # average loss per batch during training
         print(f"Epoch {epoch +1},\
-            Loss_train: {running_loss_train / len(dataloader_training)},\
-            Loss_eval: {running_loss_eval / len(dataloader_eval)}") 
+            Loss_train: {loss_train},\
+            Loss_eval: {eval_train}") 
 
-
+    plot_error_curves(train_losses, eval_losses)
+    
     print("Saving the fine-tuned-weights")
     torch.save(model.state_dict(), 'u2net_fine_tuned_weights.pth')
 
     
-    
     print("Runnin inference...")
     run_inference()
+    
+    calc_all_metrics()
 
 if __name__ == '__main__':
     main()
