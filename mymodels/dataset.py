@@ -7,7 +7,7 @@ import os
 padding_transform = transforms.Compose([
     # how many pixels apply to each side
     transforms.Pad((8,8)),
-    transforms.Resize((416, 416)),
+    # transforms.Resize((416, 416)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5], std=[0.5])
 ])
@@ -43,5 +43,7 @@ class SegmentationDataset(Dataset):
             mask = self.transform(mask)
 
         return image, mask
-    
+
+
+
 

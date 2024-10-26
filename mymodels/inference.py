@@ -1,22 +1,29 @@
 import sys
 import torch
 import os
-sys.path.append('..\\U-2-Net\\')
+sys.path.append('../U-2-Net/')
 from model.u2net import U2NET
 from dataset import SegmentationDataset
 from torch.utils.data import DataLoader
+import numpy as np
+from PIL import Image 
+from pathlib import Path
+import utils
 
 def run_inference():
 
     path_weights = 'u2net_fine_tuned_weights.pth'
-    image_dir='validation_images'
+    images_dir='validation_images'
+    masks_dir='validation_masks'
     result_masks_dir='result_masks'
+    overlay_dir = 'overlay_masks'
     os.makedirs(result_masks_dir, exist_ok=True)
 
     model = U2NET()
 
     inference_dataset= SegmentationDataset(
-        image_dir=image_dir
+        images_dir=images_dir,
+        masks_dir=masks_dir
     )
     inference_loader = DataLoader(
         inference_dataset,
@@ -28,7 +35,7 @@ def run_inference():
 
     with torch.no_grad():
 
-        for idx, (images, masks) in enumerate(inference_loader):
+        for idx, (images, _) in enumerate(inference_loader):
             outputs = model(images)
             masks = (outputs[0] > 0.5).cpu().numpy()
 
@@ -36,10 +43,17 @@ def run_inference():
                 mask = masks[i,0]
                 mask_image = (mask*255).astype(np.uint8)
                 mask_pil = Image.fromarray(mask_image)
+                mask_resized=utils.remove_padding(mask_pil)
 
-                image_name = inference_dataset.images[idx]
+                image_name = inference_dataset.images[idx*4+i]
                 mask_name = os.path.splitext(image_name)[0]
-                mask_pil.save(os.path.join(result_masks_dir, mask_name))
+
+                print(mask_name)
+                file_name= os.path.join(result_masks_dir, mask_name)
+                print(file_name)
+                mask_pil.save(f"{file_name}.JPEG", format="JPEG")
 
 
+if __name__ == "__main__":
 
+    run_inference()
