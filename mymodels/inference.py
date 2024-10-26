@@ -8,21 +8,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 from PIL import Image 
 from pathlib import Path
-
-def overlay_mask(img_path, mask, color=(0, 0, 255), pad=(8,8), opacity=0.3):
-    img = Image.open(img_path).convert("RGB")
-    # img.convert("RGBA")
-
-    color_mask = Image.new("RGB", img.size, color)
-
-    box = (pad[0], pad[1], mask.size[0] - pad[0], mask.size[1] - pad[1])
-    color_mask = Image.composite(color_mask, img, mask.crop(box))
-
-    # print(color_mask.size, img.size, mask_pil.crop((8, 8, mask_pil.size[0] - 8, mask_pil.size[1] - 8)).size)
-
-    img = img.convert(color_mask.mode)
-
-    return Image.blend(img, color_mask, opacity)
+import utils
 
 def run_inference():
 
@@ -58,16 +44,16 @@ def run_inference():
                 mask = masks[i,0]
                 mask_image = (mask*255).astype(np.uint8)
                 mask_pil = Image.fromarray(mask_image)
+                mask_resized=utils.remove_padding(mask_pil)
 
                 image_name = inference_dataset.images[idx*4+i]
                 mask_name = os.path.splitext(image_name)[0]
-
-                blended = overlay_mask(Path(images_dir) / image_name, mask_pil)
 
                 print(mask_name)
                 file_name= os.path.join(result_masks_dir, mask_name)
                 print(file_name)
                 mask_pil.save(f"{file_name}.JPEG", format="JPEG")
+                blended = utils.overlay_mask(Path(images_dir) / image_name, Path(f"{file_name}.JPEG"))
                 blended.save(overlay_dir / Path(image_name).with_suffix(".png"))
 
 
