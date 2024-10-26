@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 def eval_model(dataloader_train, model, criterion, device):
 
+    #Carrega o modelo
     model.eval()
 
     running_loss = 0.0 
@@ -25,12 +26,16 @@ def train_model(dataloader_train, model, criterion, optimizer, device):
     running_loss = 0.0 
     for images, masks in tqdm(dataloader_train):
         images, masks = images.to(device), masks.to(device)
+        # reset the gradients
         optimizer.zero_grad()
 
         outputs = model(images)
         outputs=outputs[0]
+        #calculate the loss between the model predictions and the ground truths
         loss = criterion(outputs, masks)
+        #perform backpropagation > compute the gradients of loss
         loss.backward()
+        # update the model parameters using the gradients in loss.backward()
         optimizer.step()
 
         running_loss += loss.item()

@@ -16,8 +16,9 @@ def run_inference():
     images_dir='validation_images'
     masks_dir='validation_masks'
     result_masks_dir='result_masks'
-    overlay_dir = 'overlay_masks'
+    overlay_dir = Path('overlay_masks')
     os.makedirs(result_masks_dir, exist_ok=True)
+    overlay_dir.mkdir(parents=True, exist_ok=True)
 
     model = U2NET()
 
@@ -52,6 +53,8 @@ def run_inference():
                 file_name= os.path.join(result_masks_dir, mask_name)
                 print(file_name)
                 mask_pil.save(f"{file_name}.JPEG", format="JPEG")
+                blended = utils.overlay_mask(Path(images_dir) / image_name, Path(f"{file_name}.JPEG"))
+                blended.save(overlay_dir / Path(image_name).with_suffix(".png"))
 
 
 if __name__ == "__main__":
