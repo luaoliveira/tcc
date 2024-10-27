@@ -11,10 +11,13 @@ from PIL import Image
 from inference import run_inference
 from pathlib import Path
 from sklearn.model_selection import KFold
+from metrics import calc_all_metrics
+from utils import plot_error_curves
+import numpy as np
 
 images_dir='training_images'
 masks_dir = 'training_masks'
-epochs=15
+epochs=25
 batch_size=4
 k_folds = 5
 model_weights_file=Path('../U-2-Net/saved_models/u2net.pth')
@@ -23,7 +26,7 @@ training_losses=[]
 validation_losses=[]
 delta = 0.001
 patience = 5
-
+error_file = Path("Erros.txt")
 
 
 def main():
@@ -40,8 +43,8 @@ def main():
 
     for fold, (train_idx, val_idx) in enumerate(kfold.split(dataset_training)):
 
-        fold_train_losses = []
-        fold_val_losses = []
+        train_losses=[]
+        eval_losses=[]
 
         best_val_loss = float('inf')
         epochs_no_improve = 0
@@ -112,21 +115,36 @@ def main():
                 print(f"Early stopping on fold {fold+1}, {epoch+1}")
                 break
 
-
+            train_losses.append(avg_loss_train)
+            eval_losses.append(avg_loss_eval)
 
             # average loss per batch during training
             print(f"Fold {fold + 1}, Epoch {epoch + 1}, "
-                f"Loss_train: {running_loss_train / len(dataloader_training)}, "
-                f"Loss_eval: {running_loss_eval / len(dataloader_eval)}") 
+                f"Loss_train: {avg_loss_train}, "
+                f"Loss_eval: {avg_loss_eval}") 
 
+        all_fold_val_losses.append(min(eval_losses))
 
         # print("Saving the fine-tuned-weights")
         # torch.save(model.state_dict(), 'u2net_fine_tuned_weights.pth')
+        plot_error_curves(train_losses, eval_losses)
 
-    
-    
+        error_file = Path(f"Erros_fold_{fold + 1}.txt")
+
+        with error_file.open('w') as f:
+            f.writelines([f'{i} {train} {val}\n' for i, (train, val) in enumerate(zip(train_losses, eval_losses))])
+
         print("Runnin inference...")
         run_inference()
 
-if __name__ == '__main_k_fold_test__':
+    avg_k_fold_eval = np.mean(all_fold_val_losses)
+    std_k_fold_eval = np.std(all_fold_val_losses)
+
+    path_eval_u2net = Path(f"u2net_evaluation.txt")
+
+    with path_eval_u2net.open('w') as f:
+        f.write(f'avg: {avg_k_fold_eval}, std: {std_k_fold_eval} ')
+
+
+if __name__ == '__main__':
     main()
