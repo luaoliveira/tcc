@@ -152,7 +152,7 @@ def overlay_mask(img_path, mask_path, color=(0, 0, 255), pad=(8,8), opacity=0.3)
 
     return Image.blend(img, color_mask, opacity)
 
-def plot_error_curves(train_losses, val_losses):
+def plot_error_curves(train_losses, val_losses, file_name):
 
     plt.figure(figsize=(10,10))
     plt.plot(train_losses, label='Erro de treino')
@@ -162,4 +162,4 @@ def plot_error_curves(train_losses, val_losses):
     plt.ylabel('Erros')
     plt.title('Curvas de erro')
     plt.legend()
-    plt.savefig('error_curves.png')
+    plt.savefig(f'{file_name}.png')
