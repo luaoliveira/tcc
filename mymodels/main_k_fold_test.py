@@ -14,18 +14,19 @@ from sklearn.model_selection import KFold
 from metrics import calc_all_metrics
 from utils import plot_error_curves
 import numpy as np
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 
 images_dir='training_images'
 masks_dir = 'training_masks'
-epochs=25
+epochs=30
 batch_size=4
-k_folds = 5
+k_folds = 10
 model_weights_file=Path('../U-2-Net/saved_models/u2net.pth')
 all_fold_val_losses = []
 training_losses=[]
 validation_losses=[]
-delta = 0.001
-patience = 5
+delta = 0.0005
+patience = 8
 error_file = Path("Erros.txt")
 
 
@@ -54,11 +55,13 @@ def main():
         model.load_state_dict(torch.load(model_weights_file))
 
         criterion = nn.BCEWithLogitsLoss()
-        optimizer = optim.Adam(model.parameters(), lr=1e-3)
+        optimizer = optim.Adam(model.parameters(), lr=1e-4)
+        scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=epochs, T_mult=2)
 
 
         train_subset = Subset(dataset_training, train_idx)
         val_subset= Subset(dataset_training, val_idx)
+        print(f'None means no data leakage:{set(train_idx).intersection(set(val_idx)) }')
 
         ###################################################
         #Data loaders anteriores
@@ -122,6 +125,8 @@ def main():
             print(f"Fold {fold + 1}, Epoch {epoch + 1}, "
                 f"Loss_train: {avg_loss_train}, "
                 f"Loss_eval: {avg_loss_eval}") 
+            
+            scheduler.step() 
 
         all_fold_val_losses.append(min(eval_losses))
 
@@ -129,13 +134,13 @@ def main():
         # torch.save(model.state_dict(), 'u2net_fine_tuned_weights.pth')
         plot_error_curves(train_losses, eval_losses,f'{fold}_fold_learning_curve')
 
-        error_file = Path(f"Erros_fold_{fold + 1}.txt")
+        # error_file = Path(f"Erros_fold_{fold + 1}.txt")
 
-        with error_file.open('w') as f:
-            f.writelines([f'{i} {train} {val}\n' for i, (train, val) in enumerate(zip(train_losses, eval_losses))])
+        # with error_file.open('w') as f:
+        #     f.writelines([f'{i} {train} {val}\n' for i, (train, val) in enumerate(zip(train_losses, eval_losses))])
 
-        print("Runnin inference...")
-        run_inference()
+        # print("Running inference...")
+        # run_inference()
 
     avg_k_fold_eval = np.mean(all_fold_val_losses)
     std_k_fold_eval = np.std(all_fold_val_losses)

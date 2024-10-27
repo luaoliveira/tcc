@@ -52,9 +52,10 @@ def run_inference():
                 print(mask_name)
                 file_name= os.path.join(result_masks_dir, mask_name)
                 print(file_name)
-                mask_pil.save(f"{file_name}.JPEG", format="JPEG")
-                blended = utils.overlay_mask(Path(images_dir) / image_name, Path(f"{file_name}.JPEG"))
-                blended.save(overlay_dir / Path(image_name).with_suffix(".png"))
+                mask_pil.save(f"{file_name}.jpg", format="jpeg")
+                blended = utils.overlay_mask(Path(images_dir) / image_name, Path(f"{file_name}.jpg"))
+                blended.save(overlay_dir / Path(image_name).with_suffix(".jpg"))
+                mask_resized.save(f"{file_name}.jpg", format="jpeg")
 
 
 if __name__ == "__main__":

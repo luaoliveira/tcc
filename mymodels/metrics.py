@@ -60,7 +60,7 @@ def calc_all_metrics():
     n = len(files)
 
     for file in files:
-
+        print(path_ground_truths, path_pred_masks, file)
         pred_masks.append(cv2.imread(f'{path_pred_masks}{file}'))
         ground_truths.append(cv2.imread(f"{path_ground_truths}{file}"))
 

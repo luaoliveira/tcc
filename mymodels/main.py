@@ -13,6 +13,7 @@ from inference import run_inference
 import numpy as np
 from utils import plot_error_curves
 from metrics import calc_all_metrics
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 
 images_dir='training_images'
 masks_dir = 'training_masks'
@@ -31,7 +32,8 @@ def main():
     model.load_state_dict(torch.load('../U-2-Net/saved_models/u2net.pth'))
 
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr=9e-4)
+    optimizer = optim.Adam(model.parameters(), lr=2e-3)
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2)
     dataset_training= SegmentationDataset(
         images_dir=images_dir,
         masks_dir=masks_dir,
@@ -40,9 +42,7 @@ def main():
 
     dataset_eval= SegmentationDataset(
         images_dir="validation_images",
-        masks_dir="validation_masks",
-        images_dir="validation_images",
-        masks_dir="validation_masks",
+        masks_dir="validation_masks"
     )
     dataloader_eval=DataLoader(dataset_eval, batch_size=4, shuffle=False)
 
@@ -57,7 +57,6 @@ def main():
             device=device
         )
         running_loss_eval=eval_model(
-            dataloader_eval, 
             dataloader_eval, 
             model=model, 
             criterion=criterion, 
@@ -75,8 +74,10 @@ def main():
         print(f"Epoch {epoch +1},\
             Loss_train: {loss_train},\
             Loss_eval: {eval_train}") 
+        
+        scheduler.step() 
 
-    plot_error_curves(train_losses, eval_losses)
+    plot_error_curves(train_losses, eval_losses, 'main_loss_u2net')
 
     with open('Erros.txt', 'w') as f:
         f.writelines([f'{i} {train} {val}\n' for i, (train, val) in enumerate(zip(train_losses, eval_losses))])
