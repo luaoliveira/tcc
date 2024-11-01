@@ -4,3 +4,5 @@ sam_vit_b_01ec64.pth
 coco-annotator/
 mymodels/u2net_fine_tuned_weights.pth
 __pycache__/
+
+*.pth

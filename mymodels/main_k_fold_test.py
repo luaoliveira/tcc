@@ -19,7 +19,7 @@ from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 images_dir='training_images'
 masks_dir = 'training_masks'
 epochs=30
-batch_size=4
+batch_size=8
 k_folds = 10
 model_weights_file=Path('../U-2-Net/saved_models/u2net.pth')
 all_fold_val_losses = []
@@ -55,7 +55,7 @@ def main():
         model.load_state_dict(torch.load(model_weights_file))
 
         criterion = nn.BCEWithLogitsLoss()
-        optimizer = optim.Adam(model.parameters(), lr=1e-4)
+        optimizer = optim.Adam(model.parameters(), lr=2e-3)
         scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=epochs, T_mult=2)
 
 
@@ -140,7 +140,9 @@ def main():
         #     f.writelines([f'{i} {train} {val}\n' for i, (train, val) in enumerate(zip(train_losses, eval_losses))])
 
         # print("Running inference...")
-        # run_inference()
+            
+        # model_name = type(model).__name__
+        # run_inference(model_name)
 
     avg_k_fold_eval = np.mean(all_fold_val_losses)
     std_k_fold_eval = np.std(all_fold_val_losses)

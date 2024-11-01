@@ -2,6 +2,9 @@
 import numpy as np
 import os
 import cv2
+from pathlib import Path
+from graphics import plot_confusion_matrix
+
 
 def calc_pixel_accuracy(predicted_mask, ground_truth):
 
@@ -48,10 +51,11 @@ def calc_f1_score(predicted_mask, ground_truth):
     return (2*precision*recall)/(precision + recall)
 
 
-def calc_all_metrics():
+def calc_all_metrics(model_name):
 
-    path_pred_masks = 'result_masks/'
+    path_pred_masks = f'{model_name}_{result_masks}'
     path_ground_truths = 'validation_masks/'
+    metrics_file_path = Path(f'{model_name}_test_metrics.txt')
 
     pred_masks=[]
     ground_truths = []
@@ -86,7 +90,13 @@ def calc_all_metrics():
     print(mean_precs)
     print(mean_recalls)
     print(mean_f1s)
-        
+    
+    content = [mean_px_acc, mean_iou, mean_precs, mean_recalls, mean_f1s]
+    with metrics_file_path.open("w", encoding="utf-8") as file:
+        for item in content:
+            file.write(f"{item}\n")
+
+    plot_confusion_matrix(ground_truths.flatten(), pred_masks.flatten())
 
 
 if __name__ == '__main__':

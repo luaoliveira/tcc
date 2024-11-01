@@ -77,19 +77,19 @@ def main():
         
         scheduler.step() 
 
-    plot_error_curves(train_losses, eval_losses, 'main_loss_u2net')
+    plot_error_curves(train_losses, eval_losses, 'error-curves-2unet')
 
-    with open('Erros.txt', 'w') as f:
+    with open('Erros_u2net.txt', 'w') as f:
         f.writelines([f'{i} {train} {val}\n' for i, (train, val) in enumerate(zip(train_losses, eval_losses))])
     
-    print("Saving the fine-tuned-weights")
+    print("Saving the fine-tuned-weights-2unet")
     torch.save(model.state_dict(), 'u2net_fine_tuned_weights.pth')
 
-    
+    model_name = type(model).__name__
     print("Runnin inference...")
-    run_inference()
+    run_inference(model_name)
     
-    calc_all_metrics()
+    calc_all_metrics(model_name)
 
 if __name__ == '__main__':
     main()
