@@ -33,7 +33,7 @@ def plot_images_with_masks(original_folder, mask_folder, model_name):
     mask_images = os.listdir(mask_folder)
     
     # Set the number of images to plot
-    num_images = 6
+    num_images = 5
     #min(len(original_images), len(mask_images))
     
     # Create a figure with subplots
