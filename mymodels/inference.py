@@ -36,10 +36,11 @@ def run_inference(model_name):
         in_channels=3,
         classes=1
         )
-    elif model_name== 'UNET-NOFT':
+        path_weights = 'unet_fine_tuned_weights.pth'
 
-        path_weights=''
+    elif model_name.upper() == 'U2NET-NOFT':
 
+        model = U2NET()
         path_weights = 'u2net-original-weights.pth'
 
     inference_dataset= SegmentationDataset(
@@ -72,8 +73,9 @@ def run_inference(model_name):
                 mask_name = os.path.splitext(image_name)[0]
 
                 print(mask_name)
-                result_masks_dir=f'{model_name}_{result_masks_dir}'
-                file_name= os.path.join(result_masks_dir, mask_name)
+                result_masks_dir_path=Path(f'{model_name}_{result_masks_dir}')
+                result_masks_dir_path.mkdir(parents=True, exist_ok=True)
+                file_name= os.path.join(result_masks_dir_path, mask_name)
                 print(file_name)
                 mask_pil.save(f"{file_name}.jpg", format="jpeg")
                 # blended = utils.overlay_mask(Path(images_dir) / image_name, Path(f"{file_name}.jpg"))
@@ -85,4 +87,4 @@ def run_inference(model_name):
 
 if __name__ == "__main__":
 
-    run_inference('u2net-noft')
+    run_inference('U2NET')

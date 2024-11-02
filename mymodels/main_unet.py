@@ -88,7 +88,7 @@ def main():
     model_name = type(model).__name__
     run_inference(model_name)
 
-    calc_all_metrics()
+    calc_all_metrics(model_name)
 
 if __name__ == '__main__':
     main()

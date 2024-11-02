@@ -8,9 +8,6 @@ from graphics import plot_confusion_matrix
 
 def calc_pixel_accuracy(predicted_mask, ground_truth):
 
-    ground_truth = np.where(ground_truth < 30, 0, 255)
-    predicted_mask = np.where(predicted_mask < 30, 0, 255)
-
     correct_pixels = (predicted_mask == ground_truth).astype(int)
     pixel_accuracy = correct_pixels.sum(axis=None)/correct_pixels.size
 
@@ -50,10 +47,18 @@ def calc_f1_score(predicted_mask, ground_truth):
 
     return (2*precision*recall)/(precision + recall)
 
+def calc_confusion_matrix(predicted_mask, ground_truth):
+
+    TP = np.sum((predicted_mask == 255) & (ground_truth == 255))
+    FN = np.sum((predicted_mask == 0) & (ground_truth == 255))
+    FP = np.sum((predicted_mask == 255) & (ground_truth == 0))
+    TN = np.sum((predicted_mask == 0) & (ground_truth == 0))
+
+    return TP, TN, FP, FN
 
 def calc_all_metrics(model_name):
 
-    path_pred_masks = f'{model_name}_{result_masks}'
+    path_pred_masks = f'{model_name}_result_masks/'
     path_ground_truths = 'validation_masks/'
     metrics_file_path = Path(f'{model_name}_test_metrics.txt')
 
@@ -68,8 +73,10 @@ def calc_all_metrics(model_name):
         pred_masks.append(cv2.imread(f'{path_pred_masks}{file}'))
         ground_truths.append(cv2.imread(f"{path_ground_truths}{file}"))
 
-
     for i in range(n):
+
+        ground_truths[i] = np.where(ground_truths[i] < 30, 0, 255)
+        pred_masks[i] = np.where(pred_masks[i] < 30, 0, 255)
         
         pixel_accuracies = list(map(calc_pixel_accuracy, pred_masks, ground_truths))
         ious= list(map(calc_iou, pred_masks,ground_truths))
@@ -96,8 +103,12 @@ def calc_all_metrics(model_name):
         for item in content:
             file.write(f"{item}\n")
 
-    plot_confusion_matrix(ground_truths.flatten(), pred_masks.flatten())
-
+    flattened_predm = np.concatenate([img.flatten() for img in pred_masks if img is not None])
+    flattened_gts = np.concatenate([img.flatten() for img in ground_truths if img is not None])
+    
+    # plot_confusion_matrix(flattened_gts, flattened_predm, 'U2NET')
+    TP, TN, FP, FN = calc_confusion_matrix(flattened_predm, flattened_gts)
+    plot_confusion_matrix(TP, TN, FP, FN, model_name)
 
 if __name__ == '__main__':
-    calc_all_metrics()
+    calc_all_metrics('Unet')

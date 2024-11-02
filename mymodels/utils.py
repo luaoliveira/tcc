@@ -28,12 +28,13 @@ def remove_padding(mask_pil):
 plot the image and the mask side by side in groups of 2
 """
 
-def plot_images_with_masks(original_folder, mask_folder):
+def plot_images_with_masks(original_folder, mask_folder, model_name):
     original_images = os.listdir(original_folder)
     mask_images = os.listdir(mask_folder)
     
     # Set the number of images to plot
-    num_images = min(len(original_images), len(mask_images))
+    num_images = 6
+    #min(len(original_images), len(mask_images))
     
     # Create a figure with subplots
     fig, axes = plt.subplots(num_images, 2, figsize=(8, num_images * 3))
@@ -49,15 +50,15 @@ def plot_images_with_masks(original_folder, mask_folder):
         # Plot the original image
         axes[i, 0].imshow(original_image)
         axes[i, 0].axis('off')
-        axes[i, 0].set_title('Original Image')
+        axes[i, 0].set_title('Original Images')
 
         # Plot the mask
         axes[i, 1].imshow(mask_image, cmap='gray')  # Use gray for the mask
         axes[i, 1].axis('off')
-        axes[i, 1].set_title('Mask')
+        axes[i, 1].set_title('Masks')
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f'{model_name}_vs_original_imgs_comp.png')
 
 
 # def plot_images_side_by_side(original_folder, mask_folder):
