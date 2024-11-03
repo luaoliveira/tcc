@@ -132,7 +132,7 @@ def main():
 
         # print("Saving the fine-tuned-weights")
         # torch.save(model.state_dict(), 'u2net_fine_tuned_weights.pth')
-        plot_error_curves(train_losses, eval_losses,f'{fold}_fold_learning_curve')
+        plot_error_curves(train_losses, eval_losses,f'{fold}_fold_learning_curve', 'U2net')
 
         # error_file = Path(f"Erros_fold_{fold + 1}.txt")
 

@@ -10,6 +10,8 @@ from inference import run_inference
 from utils import plot_error_curves
 from metrics import calc_all_metrics
 from pathlib import Path
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+
 
 # Directory paths
 images_dir = 'training_images'
@@ -35,16 +37,19 @@ def main():
     # Define loss function and optimizer
     # criterion = nn.BCELoss()
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=2e-3)
+    # scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=1)
+
 
     # Prepare training and validation datasets and dataloaders
     dataset_training = SegmentationDataset(images_dir=images_dir, masks_dir=masks_dir)
     dataloader_training = DataLoader(dataset_training, batch_size=4, shuffle=True)
 
     dataset_eval = SegmentationDataset(images_dir="validation_images", masks_dir="validation_masks")
-    dataloader_eval = DataLoader(dataset_eval, batch_size=4, shuffle=False)
-
-    print('Training model...')
+    dataloader_eval = DataLoader(dataset_eval, batch_size=3, shuffle=False)
+    
+    model_name = type(model).__name__
+    print(f'Training model {model_name}...')
 
     for epoch in range(epochs):
         # Training and evaluation steps
@@ -72,8 +77,10 @@ def main():
 
         print(f"Epoch {epoch + 1}, Loss_train: {loss_train}, Loss_eval: {eval_loss}")
 
+        # scheduler.step()
+
     # Plot error curves for visualization
-    plot_error_curves(train_losses, eval_losses, 'error-curves-unet')
+    plot_error_curves(train_losses, eval_losses, 'error-curves-unet', model_name)
 
     # Save losses to a file for record-keeping
     with Path('Errors_unet.txt').open('w') as f:
