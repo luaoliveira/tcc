@@ -19,6 +19,7 @@ masks_dir = 'training_masks'
 epochs = 30
 train_losses = np.zeros(epochs)
 eval_losses = np.zeros(epochs)
+batch_size=3
 
 def main():
     # Set device
@@ -37,16 +38,16 @@ def main():
     # Define loss function and optimizer
     # criterion = nn.BCELoss()
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr=2e-3)
+    optimizer = optim.Adam(model.parameters(), lr=1e-3)
     # scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=1)
 
 
     # Prepare training and validation datasets and dataloaders
     dataset_training = SegmentationDataset(images_dir=images_dir, masks_dir=masks_dir)
-    dataloader_training = DataLoader(dataset_training, batch_size=4, shuffle=True)
+    dataloader_training = DataLoader(dataset_training, batch_size=batch_size, shuffle=True)
 
     dataset_eval = SegmentationDataset(images_dir="validation_images", masks_dir="validation_masks")
-    dataloader_eval = DataLoader(dataset_eval, batch_size=3, shuffle=False)
+    dataloader_eval = DataLoader(dataset_eval, batch_size=batch_size, shuffle=False)
     
     model_name = type(model).__name__
     print(f'Training model {model_name}...')

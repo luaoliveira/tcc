@@ -1,0 +1,8 @@
+('Pixel_accuracy', 0.9674140625000002)
+('Intersection over Union', 0.8770643703480246)
+('Precision', 0.9519764852658207)
+('Recall', 0.9128450897307809)
+('F1 score', 0.9297648702612907)
+
+batch_size = 3
+lr = 2e-3

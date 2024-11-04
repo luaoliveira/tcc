@@ -17,7 +17,7 @@ from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
 
 images_dir='training_images'
 masks_dir = 'training_masks'
-epochs=30
+epochs=29
 train_losses=np.zeros(epochs)
 eval_losses=np.zeros(epochs)
 delta = 0.0001
@@ -37,7 +37,7 @@ def main():
     model.load_state_dict(torch.load('../U-2-Net/saved_models/u2net.pth'))
 
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr= 2e-3)
+    optimizer = optim.Adam(model.parameters(), lr= 1e-3)
     scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=1)
     dataset_training= SegmentationDataset(
         images_dir=images_dir,
@@ -54,7 +54,7 @@ def main():
     )
     dataloader_eval=DataLoader(
         dataset_eval,
-        batch_size=4,
+        batch_size=batch_size,
         shuffle=False)
 
     model_name = type(model).__name__
