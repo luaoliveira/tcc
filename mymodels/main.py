@@ -37,8 +37,8 @@ def main():
     model.load_state_dict(torch.load('../U-2-Net/saved_models/u2net.pth'))
 
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr= 1e-3)
-    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=1)
+    optimizer = optim.Adam(model.parameters(), lr= 2e-3)
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=8, T_mult=1)
     dataset_training= SegmentationDataset(
         images_dir=images_dir,
         masks_dir=masks_dir,

@@ -81,12 +81,12 @@ def plot_images_comparison(image_name):
     image4 = mpimg.imread(f'U2NET_result_masks/{image_name}.jpg')
 
     # Create a 1x4 subplot figure
-    fig, axes = plt.subplots(1, 2, figsize=(10, 5))  # Adjust figsize for larger display if needed
+    fig, axes = plt.subplots(1, 4, figsize=(10, 5))  # Adjust figsize for larger display if needed
 
     # Plot each image in a subplot
     axes[0].imshow(image1)
     axes[0].axis('off')  # Hide axis
-    axes[0].set_title("Original image")  # Optional: Set title
+    axes[0].set_title("Imagem original")  # Optional: Set title
 
     axes[1].imshow(image2)
     axes[1].axis('off')
@@ -195,7 +195,7 @@ def plot_false_negatives_positives(ground_truth_path, predicted_mask_path, origi
     display_image[false_negatives] = [0, 0, 255]  # Blue for false negatives
 
     # Plot the original image and the false positives/negatives side by side
-    fig, axes = plt.subplots(1, 2, figsize=(16, 8))
+    fig, axes = plt.subplots(1, 2, figsize=(10, 5))
 
     # Display the original image
     axes[0].imshow(cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB))

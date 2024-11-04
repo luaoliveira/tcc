@@ -38,8 +38,8 @@ def main():
     # Define loss function and optimizer
     # criterion = nn.BCELoss()
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
-    # scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=1)
+    optimizer = optim.Adam(model.parameters(), lr=2e-4)
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=1)
 
 
     # Prepare training and validation datasets and dataloaders
@@ -78,7 +78,7 @@ def main():
 
         print(f"Epoch {epoch + 1}, Loss_train: {loss_train}, Loss_eval: {eval_loss}")
 
-        # scheduler.step()
+        scheduler.step()
 
     # Plot error curves for visualization
     plot_error_curves(train_losses, eval_losses, 'error-curves-unet', model_name)
