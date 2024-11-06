@@ -78,9 +78,9 @@ def plot_confusion_matrix(tp, tn, fp, fn, model_name):
 def plot_images_comparison(image_name):
 
     image1 = mpimg.imread(f'validation_images/{image_name}.jpg')
-    image2 = mpimg.imread(f'validation_masks/{image_name}.jpg')
-    image3 = mpimg.imread(f'Unet_result_masks/{image_name}.jpg')
-    image4 = mpimg.imread(f'U2NET_result_masks/{image_name}.jpg')
+    image2 = mpimg.imread(f'validation_masks/{image_name}.bmp')
+    image3 = mpimg.imread(f'Unet_result_masks/{image_name}.bmp')
+    image4 = mpimg.imread(f'U2NET_result_masks/{image_name}.bmp')
 
     # Create a 1x4 subplot figure
     fig, axes = plt.subplots(1, 4, figsize=(10, 5))  # Adjust figsize for larger display if needed

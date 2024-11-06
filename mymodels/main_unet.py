@@ -39,7 +39,7 @@ def main():
     # criterion = nn.BCELoss()
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=2e-4)
-    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=1)
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=epochs, T_mult=1)
 
 
     # Prepare training and validation datasets and dataloaders
