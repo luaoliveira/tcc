@@ -32,7 +32,7 @@ class SegmentationDataset(Dataset):
     def __getitem__(self, idx):
 
         img_path = os.path.join(self.images_dir, self.images[idx])
-        mask_path = os.path.join(self.masks_dir, self.images[idx])
+        mask_path = os.path.join(self.masks_dir, f"{self.images[idx][:-3]}bmp")
 
         image = Image.open(img_path).convert("RGB")
         #Convert the image to greyscale mode (L = luminance)

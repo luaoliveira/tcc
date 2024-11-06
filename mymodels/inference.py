@@ -77,10 +77,10 @@ def run_inference(model_name):
                 result_masks_dir_path.mkdir(parents=True, exist_ok=True)
                 file_name= os.path.join(result_masks_dir_path, mask_name)
                 print(file_name)
-                mask_pil.save(f"{file_name}.jpg", format="jpeg")
-                # blended = utils.overlay_mask(Path(images_dir) / image_name, Path(f"{file_name}.jpg"))
-                # blended.save(overlay_dir / Path(image_name).with_suffix(".jpg"))
-                mask_resized.save(f"{file_name}.jpg", format="jpeg")
+                mask_pil.save(f"{file_name}.bmp", format="bmp")
+                blended = utils.overlay_mask(Path(images_dir) / image_name, Path(f"{file_name}.bmp"))
+                blended.save(overlay_dir / Path(image_name).with_suffix(".jpg"))
+                mask_resized.save(f"{file_name}.bmp", format="bmp")
 
     calc_all_metrics(model_name)
 

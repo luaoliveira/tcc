@@ -37,7 +37,9 @@ if json_file:
 
 for image in coco_data['images']:
     image_id = image['id']
-    file_name = image['file_name']
+    #change here if wants to change the file format. leave just image['file_name']
+    file_name = f"{image['file_name'][:-3]}bmp"
+
     annotations = [ann for ann in coco_data['annotations'] if ann['image_id'] == image_id]
 
     mask = create_mask(annotations, img_height, img_width)
@@ -45,5 +47,4 @@ for image in coco_data['images']:
     mask_image=Image.fromarray(mask*255)
 
     save_path = mask_dir / file_name
-
-    mask_image.save(save_path)
+    mask_image.save(save_path, format='bmp')

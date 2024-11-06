@@ -4,7 +4,9 @@ from sklearn.metrics import confusion_matrix
 import numpy as np
 import plotly.graph_objects as go
 import matplotlib.image as mpimg
-
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
 def plot_confusion_matrix(tp, tn, fp, fn, model_name):
     """
@@ -159,9 +161,7 @@ import matplotlib.pyplot as plt
 #     plt.savefig("false_positives_negatives.png", bbox_inches='tight', dpi=300)
 
 
-import cv2
-import numpy as np
-import matplotlib.pyplot as plt
+
 
 def plot_false_negatives_positives(ground_truth_path, predicted_mask_path, original_image_path, model_name):
     """
@@ -179,13 +179,16 @@ def plot_false_negatives_positives(ground_truth_path, predicted_mask_path, origi
     ground_truth = cv2.imread(ground_truth_path, cv2.IMREAD_GRAYSCALE)
     predicted_mask = cv2.imread(predicted_mask_path, cv2.IMREAD_GRAYSCALE)
 
-    # Apply threshold to ensure binary values (0 or 1)
-    _, ground_truth = cv2.threshold(ground_truth, 30, 1, cv2.THRESH_BINARY)
-    _, predicted_mask = cv2.threshold(predicted_mask, 30, 1, cv2.THRESH_BINARY)
+    # # Apply threshold to ensure binary values (0 or 1)
+    # _, ground_truth = cv2.threshold(ground_truth, 30, 1, cv2.THRESH_BINARY)
+    # _, predicted_mask = cv2.threshold(predicted_mask, 30, 1, cv2.THRESH_BINARY)
 
     # Calculate false positives and false negatives
-    false_positives = np.logical_and(predicted_mask == 1, ground_truth == 0)  # Predicted 1, Actual 0
-    false_negatives = np.logical_and(predicted_mask == 0, ground_truth == 1)  # Predicted 0, Actual 1
+    false_positives = np.logical_and(predicted_mask == 255, ground_truth == 0)  # Predicted 1, Actual 0
+    false_negatives = np.logical_and(predicted_mask == 0, ground_truth == 255)  # Predicted 0, Actual 1
+
+    print("false negatives", np.sum(false_negatives))
+    print("false positives", np.sum(false_positives))
 
     # Create an empty color map for visualization
     display_image = np.zeros((*ground_truth.shape, 3), dtype=np.uint8)
