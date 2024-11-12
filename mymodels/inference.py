@@ -11,24 +11,29 @@ from pathlib import Path
 from segmentation_models_pytorch import Unet  # Using segmentation_models_pytorch for U-Net
 import utils
 from metrics import calc_all_metrics
+from utils import parse_args
 
+def run_inference(args):
 
-def run_inference(model_name):
-
-    images_dir='validation_images'
-    masks_dir='validation_masks'
-    result_masks_dir='result_masks'
-    overlay_dir = Path('overlay_masks')
-    os.makedirs(result_masks_dir, exist_ok=True)
+    images_dir=args['validation_images']
+    masks_dir=args['validation_masks']
+    output_path = Path("output") / (args["fold_name"] if args.get("fold_name") else args["name"])
+    
+    result_masks_dir=output_path / 'result_masks'
+    result_masks_dir.mkdir(parents=True, exist_ok=True)
+    
+    overlay_dir = output_path / 'overlay_masks'
     overlay_dir.mkdir(parents=True, exist_ok=True)
-   
 
-    if model_name.upper() == "U2NET":
+
+    if args["name"].upper() == "U2NET":
 
         model = U2NET()
-        path_weights = 'u2net_fine_tuned_weights.pth'
+        path_weights = output_path / args["weights_output_path"]
+        if not path_weights.exists():
+            path_weights = Path(args["weights_output_path"])
 
-    elif model_name.upper() == "UNET":
+    elif args["name"].upper() == "UNET":
 
         model = Unet(
         encoder_name="resnet34",
@@ -36,12 +41,17 @@ def run_inference(model_name):
         in_channels=3,
         classes=1
         )
-        path_weights = 'unet_fine_tuned_weights.pth'
+        path_weights = output_path / args["weights_output_path"]
+        if not path_weights.exists():
+            path_weights = Path(args["weights_output_path"])
 
-    elif model_name.upper() == 'U2NET-NOFT':
+    elif args["name"].upper() == 'U2NET-NOFT':
 
         model = U2NET()
         path_weights = 'u2net-original-weights.pth'
+
+    else:
+        raise ValueError(f"Unexpected Model Name {args['name'].upper()}. Use one of the options [U2NET, UNET, U2NET_NOFT]")
 
     inference_dataset= SegmentationDataset(
         images_dir=images_dir,
@@ -59,7 +69,7 @@ def run_inference(model_name):
 
         for idx, (images, _) in enumerate(inference_loader):
             outputs = model(images)
-            if "U2NET" in model_name.upper():
+            if "U2NET" in args["name"].upper():
                 outputs = outputs[0]
             masks = (outputs > 0.5).cpu().numpy()
 
@@ -73,18 +83,15 @@ def run_inference(model_name):
                 mask_name = os.path.splitext(image_name)[0]
 
                 print(mask_name)
-                result_masks_dir_path=Path(f'{model_name}_{result_masks_dir}')
-                result_masks_dir_path.mkdir(parents=True, exist_ok=True)
-                file_name= os.path.join(result_masks_dir_path, mask_name)
+                file_name= result_masks_dir / mask_name
                 print(file_name)
-                mask_pil.save(f"{file_name}.bmp", format="bmp")
-                blended = utils.overlay_mask(Path(images_dir) / image_name, Path(f"{file_name}.bmp"))
+                mask_pil.save(file_name.with_suffix('.bmp'), format="bmp")
+                blended = utils.overlay_mask(Path(images_dir) / image_name, file_name.with_suffix(".bmp"))
                 blended.save(overlay_dir / Path(image_name).with_suffix(".jpg"))
-                mask_resized.save(f"{file_name}.bmp", format="bmp")
+                mask_resized.save(file_name.with_suffix(".bmp"), format="bmp")
 
-    calc_all_metrics(model_name)
+    calc_all_metrics(args)
 
 
 if __name__ == "__main__":
-
-    run_inference('U2NET')
+    run_inference(parse_args())

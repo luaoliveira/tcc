@@ -1,0 +1,25 @@
+# Dataset Parameters
+images_dir: training_images
+masks_dir: training_masks
+
+validation_images: validation_images
+validation_masks: validation_masks
+
+# Model Parameters
+name: UNET
+weights_path: ""
+pretrained: False
+
+# Training Parameters
+epochs: 30
+patience: 8
+batch_size: 3
+delta: 1.e-4
+lr: 2.e-4
+
+# Scheduler Parameters
+T_0: 30
+T_mult: 1
+
+# Output Parameters
+weights_output_path: unet_fine_tuned_weights.pth

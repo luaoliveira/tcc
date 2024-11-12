@@ -2,6 +2,9 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import yaml
+from pathlib import Path
+from argparse import ArgumentParser
 
 def save_outputs_as_masks(outputs, output_dir):
 
@@ -167,3 +170,15 @@ def plot_error_curves(train_losses, val_losses, file_name, model_name):
     plt.title(f'Curvas de erro {model_name}', fontsize=16)
 
     plt.savefig(f'{file_name}.png')
+
+def parse_args() -> dict :
+    
+    parser = ArgumentParser()
+    parser.add_argument("config", type=Path, help="Path to YAML file containing the training parameters")
+
+    args = parser.parse_args()
+
+    with open(args.config, "r") as f:
+        configs = yaml.load(f, yaml.SafeLoader)
+    
+    return configs
