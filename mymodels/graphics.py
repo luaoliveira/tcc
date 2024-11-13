@@ -7,8 +7,9 @@ import matplotlib.image as mpimg
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
-def plot_confusion_matrix(tp, tn, fp, fn, model_name):
+def plot_confusion_matrix(tp, tn, fp, fn, model_name, output_path=None):
     """
     Plots a confusion matrix using counts of true positives, true negatives,
     false positives, and false negatives.
@@ -71,19 +72,25 @@ def plot_confusion_matrix(tp, tn, fp, fn, model_name):
     )
 
     # Save the plot as an image
-    fig.write_image(f"confusion_matrix_{model_name}.png")
+    fig.write_image((output_path if output_path else Path()) / f"confusion_matrix_{model_name}.png")
 
 
 
-def plot_images_comparison(image_name):
+def plot_images_comparison(image_name, *args):
 
-    image1 = mpimg.imread(f'validation_images/{image_name}.jpg')
-    image2 = mpimg.imread(f'validation_masks/{image_name}.bmp')
-    image3 = mpimg.imread(f'Unet_result_masks/{image_name}.bmp')
-    image4 = mpimg.imread(f'U2NET_result_masks/{image_name}.bmp')
+    original_path = Path('validation_images') if Path(f'validation_images/{image_name}.jpg').exists() else Path("training_images")
+    gt_path = Path('validation_masks') if Path(f'validation_masks/{image_name}.bmp').exists() else Path("training_masks")
+    image1 = mpimg.imread((original_path / image_name).with_suffix(".jpg"))
+    image2 = mpimg.imread((gt_path / image_name).with_suffix(".bmp"))
+    # image3 = mpimg.imread(f'output/UNET/result_masks/{image_name}.bmp')
+    # image4 = mpimg.imread(f'output/U2NET/result_masks/{image_name}.bmp')
+    images = list()
+    for path in args:
+        im = Path(path) / image_name
+        images.append(mpimg.imread(im.with_suffix(".bmp")))
 
     # Create a 1x4 subplot figure
-    fig, axes = plt.subplots(1, 4, figsize=(10, 5))  # Adjust figsize for larger display if needed
+    fig, axes = plt.subplots(1, len(images)+2, figsize=(10, 5))  # Adjust figsize for larger display if needed
 
     # Plot each image in a subplot
     axes[0].imshow(image1)
@@ -94,13 +101,18 @@ def plot_images_comparison(image_name):
     axes[1].axis('off')
     axes[1].set_title("Ground Truth")
 
-    axes[2].imshow(image3)
-    axes[2].axis('off')
-    axes[2].set_title("U-Net")
+    # axes[2].imshow(image3)
+    # axes[2].axis('off')
+    # axes[2].set_title("U-Net")
 
-    axes[3].imshow(image4)
-    axes[3].axis('off')
-    axes[3].set_title("U2-Net")
+    # axes[3].imshow(image4)
+    # axes[3].axis('off')
+    # axes[3].set_title("U2-Net")
+    for id, (im, path) in enumerate(zip(images, args)):
+        name = Path(path).parent.name
+        axes[id+2].imshow(im)
+        axes[id+2].axis('off')
+        axes[id+2].set_title(name)
 
     # Display the plot
     plt.tight_layout()  # Adjust layout for better spacing

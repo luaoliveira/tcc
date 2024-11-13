@@ -107,6 +107,8 @@ def main(args):
         eval_losses=np.zeros(args["epochs"])
         output_path = args["output"] if args.get("output") else Path("output") / f'kfold_{args["name"]}_{k}'
         output_paths.append(output_path)
+        
+        args.update({"validation_images": val_im, "validation_masks": val_mask})
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # torch.set_default_device(device)
