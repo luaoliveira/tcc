@@ -2,7 +2,7 @@
 
 ## Description
 
-The purpose of this project is to provide a script to identify and segment forest regions in drone images. 
+The purpose of this project is to develop a script to identify and segment forest regions in drone images, providing an estimation of forest area in them.
 
 ## Project overview
 
