@@ -19,5 +19,8 @@ The outputs from the models are:
 
 ## Repository structure
 
-
-
+- :file_folder: configs
+- :file_folder: training images
+- :file_folder: training masks
+- :file_folder: validation images
+- :file_folder: validation masks
