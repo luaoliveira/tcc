@@ -1,4 +1,4 @@
-# Neural Networks to segment forest areas in drone images | October, 2024 Version.
+# Neural Networks to segment forest areas in drone images | 2024 V.
 
 ## Description
 
@@ -19,8 +19,10 @@ The outputs from the models are:
 
 ## Repository structure
 
-- :file_folder: configs
-- :file_folder: training images
-- :file_folder: training masks
-- :file_folder: validation images
-- :file_folder: validation masks
+- :file_folder: masks 
+- :file_folder: my_models
+  - :file_folder: configs -> configuration yml files to be filled before running the models
+  - :file_folder: training images -> images used for training / fine tuning
+  - :file_folder: training masks -> binary masks used for training 
+  - :file_folder: validation images -> images used for validation/test 
+  - :file_folder: validation masks -> images used for validation/test (during training masks located here won't be used for backpropagation)
